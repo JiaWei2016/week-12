@@ -69,12 +69,11 @@ from the geometry you've drawn.
 
 ==================================*/
 
-
 /** Notice the use of L.Map here. This is an extension of an organizational strategy we've already discussed. */
 var app = {
-  apikey: "3a5ff146a6e40b37b835932405e7417d7154d587",
-  map: L.map('map', { center: [40.75583970971843, -73.795166015625], zoom: 3 }),
-  geojsonClient: new cartodb.SQL({ user: 'moradology', format: 'geojson' }),
+  apikey: "b4721195dea6cddb0c7c0af3b5cc20a276a605ce",
+  map: L.map('map', { center: [39.949965, -75.164779], zoom: 13 }),
+  geojsonClient: new cartodb.SQL({ user: 'jiawei2016', format: 'geojson' }),
   drawnItems: new L.FeatureGroup()
 };
 
@@ -86,8 +85,21 @@ L.tileLayer('http://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png', {
   ext: 'png'
 }).addTo(app.map);
 
+
+//data
+Crashdata=$.ajax("https://raw.githubusercontent.com/dmcglone/philly-crash-data/master/data/2012/all_crashes_2012.geojson")
+
+// a function that does some kind of transformation on the response
+var parseData=function(rawData){ return JSON.parse(rawData)};
+
+Crashdata.done(function(data) {
+  var parsed = parseData(data);
+  // console.log(parsed)
+})
+
+
 // The initial query by which we map the geojson representation of a table
-app.geojsonClient.execute("SELECT * FROM world_borders") // 'LIMIT' should be added to the end of this line
+app.geojsonClient.execute("SELECT * FROM all_crashes_2012 WHERE collision_<5 OR collision_>10 LIMIT 50") // 'LIMIT' should be added to the end of this line
   .done(function(data) {
     L.geoJson(data, {
       onEachFeature: function(feature, layer) {
